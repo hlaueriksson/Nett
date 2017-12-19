@@ -33,6 +33,8 @@
         {
         }
 
+        internal int TableSpacing => this.formattingSettings.TableSpacing;
+
         internal TomlStringType DefaultStringType { get; private set; } = TomlStringType.Auto;
 
         public static TomlSettings Create() => Create(_ => { });
@@ -85,8 +87,6 @@
             => this.formattingSettings.GetKeyValueAlignColumn(table);
 
         internal string GetIndentString(int level) => this.formattingSettings.GetIndentString(level);
-
-        internal int TableSpacing => this.formattingSettings.TableSpacing;
 
         internal TomlTable.TableTypes GetTableType(Type valType)
         {

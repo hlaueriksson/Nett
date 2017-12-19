@@ -212,6 +212,23 @@
         public static string WriteString<T>(T obj, TomlSettings settings) =>
             WriteStringInternal(TomlTable.RootTable.From(settings, obj));
 
+        /// <summary>
+        /// Will write a TOML table with the new values, but keep formatting and comment changes from merge target.
+        /// </summary>
+        /// <typeparam name="T">The type of the object to serialize.</typeparam>
+        /// <param name="obj">The object instance to serialize.</param>
+        /// <param name="mergeTarget">TOML content of an already serialized instance of <typeparamref name="T"/>.</param>
+        /// <returns>Serialized instance of T with formatting and comments of <paramref name="mergeTarget"/>.</returns>
+        public static string WriteStringMerged<T>(T obj, string mergeTarget)
+        {
+            var srcTable = Toml.ReadString(mergeTarget);
+            var newTable = TomlTable.RootTable.From(TomlSettings.DefaultInstance, Toml.Create(obj));
+            var preserved = TomlTable.Combine(op => op
+                .Overwrite(srcTable).With(newTable).ExcludingComments().ForAllSourceRows());
+
+            return WriteStringInternal(preserved);
+        }
+
         private static void WriteFileInternal(TomlTable table, string filePath, TomlSettings settings)
         {
             if (table == null) { throw new ArgumentNullException(nameof(table)); }
